@@ -1,0 +1,25 @@
+Escribí el guion de un YouTube Short sobre: {tema}
+
+Estructura:
+- Primera línea: un gancho de máximo 12 palabras. Variá el tipo: puede ser una pregunta, una escena, una afirmación sorprendente o una advertencia directa. Nada de "Hola" ni "En este video".
+- Contá cómo funciona el engaño o el problema como algo que le pasa al espectador, en segunda persona.
+- Incluí una señal de alerta concreta o un paso práctico. Si el tema es un tutorial, dá los pasos exactos.
+- Última línea: un solo consejo, en una frase corta y fácil de recordar.
+
+Estilo:
+- Duración: entre 50 y 58 segundos leído en voz alta a ritmo ágil (unas 150-170 palabras).
+- Español rioplatense, informal, frases cortas.
+- Si usás un término técnico, explicalo en pocas palabras (por ejemplo: "un gestor de contraseñas, una app que las guarda por vos").
+- No describas las emociones del espectador con frases hechas como "entrás en pánico" o "el susto no te deja pensar".
+- No repitas la misma idea dos veces. El consejo final tiene que ser nuevo o resumir todo en pocas palabras, no repetir algo que ya dijiste.
+- No juzgues a las víctimas: a cualquiera le puede pasar.
+
+Exactitud:
+- No exageres tiempos ni consecuencias: nada de "en un segundo", "en dos minutos", "al instante", "sin dejar rastro".
+- No inventes datos, cifras ni casos específicos.
+- No des consejos imposibles o absolutos, como "nunca toques un enlace".
+- Si no estás seguro de cómo funciona un detalle de la estafa, no lo menciones.
+
+Formato:
+- Una frase por línea, sin líneas vacías entre ellas.
+- Solo el texto que se va a leer: sin títulos, sin indicaciones de cámara, sin emojis y sin formato markdown.

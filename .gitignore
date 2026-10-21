@@ -1,0 +1,19 @@
+# Secretos y entorno
+.env
+venv/
+
+# Archivos generados por el pipeline
+guiones/
+audios/
+audios_limpios/
+tiempos/
+subtitulos/
+videos/
+videos_viejos/
+
+# Audios sueltos de pruebas
+*.wav
+*.mp3
+
+# Archivos internos de Python
+__pycache__/
