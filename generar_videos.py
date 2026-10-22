@@ -32,6 +32,7 @@ FPS = 30
 VOLUMEN_MUSICA = 0.10               # 10% del volumen original
 FADE_ENTRADA = 1.0                  # segundos
 FADE_SALIDA = 2.0                   # segundos
+UMBRAL_INTRO = 0.5                  # arranca cuando la pista llega al 50% de su volumen fuerte
 
 
 def partir_en_lineas(palabras, fuente):
@@ -96,6 +97,25 @@ def elegir_musica(nombre):
     return pistas[numero % len(pistas)]
 
 
+def fin_de_intro(musica):
+    """Devuelve el segundo donde la pista ya suena fuerte, saltando una intro silenciosa."""
+    frecuencia = 4000  # alcanza para medir volumen, y es mucho más rápido que leer en calidad completa
+    muestras = musica.to_soundarray(fps=frecuencia)
+    if muestras.ndim > 1:
+        muestras = muestras.mean(axis=1)  # estéreo a mono
+
+    segundos = len(muestras) // frecuencia
+    if segundos < 2:
+        return 0.0
+    volumen = np.array([
+        np.sqrt(np.mean(muestras[s * frecuencia:(s + 1) * frecuencia] ** 2))
+        for s in range(segundos)
+    ])
+    referencia = np.percentile(volumen, 90)  # lo fuerte que suena en sus partes altas
+    fuertes = np.where(volumen >= referencia * UMBRAL_INTRO)[0]
+    return float(fuertes[0]) if len(fuertes) else 0.0
+
+
 def armar_audio(voz, nombre):
     """Mezcla la voz con una pista de música de fondo, si hay."""
     ruta_musica = elegir_musica(nombre)
@@ -103,8 +123,11 @@ def armar_audio(voz, nombre):
         print("  No hay música en la carpeta, sigo solo con la voz.")
         return voz
 
-    print(f"  Música: {ruta_musica.name}")
     musica = AudioFileClip(str(ruta_musica))
+    inicio = fin_de_intro(musica)
+    print(f"  Música: {ruta_musica.name} (desde el segundo {inicio:.0f})")
+    musica = musica.subclipped(inicio, musica.duration)
+
     if musica.duration < voz.duration:
         musica = musica.with_effects([afx.AudioLoop(duration=voz.duration)])
     else:

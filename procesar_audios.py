@@ -11,7 +11,8 @@ CARPETA_GUIONES = Path("guiones")
 CARPETA_AUDIOS = Path("audios")
 CARPETA_LIMPIOS = Path("audios_limpios")
 CARPETA_TIEMPOS = Path("tiempos")
-PALABRAS_A_BUSCAR = 3   # cuántas palabras del inicio del guion buscamos en la transcripción
+ARCHIVO_ESTILO = Path("estilo_voz.txt")
+PALABRAS_A_BUSCAR = 3   # cuántas palabras buscamos (del inicio del guion o del final de la instrucción)
 MARGEN = 0.15           # segundos que dejamos antes de la primera palabra, para no cortarla
 
 
@@ -56,19 +57,37 @@ def se_parecen(a, b):
     return a == b or SequenceMatcher(None, a, b).ratio() >= 0.7
 
 
-def buscar_inicio(palabras, guion):
-    """Busca las primeras palabras del guion en la transcripción. Devuelve el segundo o None.
-    Alcanza con que coincidan casi todas, porque Whisper a veces escribe mal alguna."""
-    objetivo = [normalizar(p) for p in guion.split()[:PALABRAS_A_BUSCAR]]
+def buscar_secuencia(palabras, objetivo):
+    """Busca 'objetivo' (lista de palabras) en la transcripción, tolerando una palabra distinta.
+    Devuelve el índice donde empieza, o None."""
+    objetivo = [normalizar(p) for p in objetivo]
+    objetivo = [p for p in objetivo if p]  # descarta "palabras" que eran solo signos
     transcritas = [normalizar(p["palabra"]) for p in palabras]
-    minimo = PALABRAS_A_BUSCAR - 1  # con 3 palabras, alcanza con 2
+    minimo = len(objetivo) - 1
 
     for i in range(len(transcritas) - len(objetivo) + 1):
         ventana = transcritas[i:i + len(objetivo)]
         coincidencias = sum(se_parecen(a, b) for a, b in zip(ventana, objetivo))
         if coincidencias >= minimo:
-            return palabras[i]["inicio"]
+            return i
     return None
+
+
+def buscar_corte(palabras, guion, estilo):
+    """Devuelve el segundo donde empieza el guion, o None si no lo encuentra.
+    Plan A: buscar las primeras palabras del guion.
+    Plan B: buscar las últimas palabras de la instrucción y tomar la palabra siguiente."""
+    i = buscar_secuencia(palabras, guion.split()[:PALABRAS_A_BUSCAR])
+    if i is not None:
+        return palabras[i]["inicio"], "inicio del guion"
+
+    final_instruccion = estilo.split()[-PALABRAS_A_BUSCAR:]
+    i = buscar_secuencia(palabras, final_instruccion)
+    if i is not None:
+        siguiente = i + len(final_instruccion)
+        if siguiente < len(palabras):
+            return palabras[siguiente]["inicio"], "final de la instrucción"
+    return None, None
 
 
 def guardar_wav(muestras, frecuencia, ruta):
@@ -82,6 +101,7 @@ def guardar_wav(muestras, frecuencia, ruta):
 def main():
     CARPETA_LIMPIOS.mkdir(exist_ok=True)
     CARPETA_TIEMPOS.mkdir(exist_ok=True)
+    estilo = ARCHIVO_ESTILO.read_text(encoding="utf-8").strip()
     audios = sorted(CARPETA_AUDIOS.glob("*.wav"))
     modelo = None  # lo cargamos solo si hay algo que procesar
 
@@ -103,13 +123,13 @@ def main():
         muestras, frecuencia = leer_wav(ruta_audio)
         palabras = transcribir(modelo, muestras, frecuencia)
 
-        inicio = buscar_inicio(palabras, guion)
+        inicio, metodo = buscar_corte(palabras, guion, estilo)
         if inicio is None:
-            print("  No encontré el inicio del guion. No recorto: revisalo a mano.")
+            print("  No encontré dónde empieza el guion. No recorto: revisalo a mano.")
             corte = 0.0
         else:
             corte = max(0.0, inicio - MARGEN)
-            print(f"  Guion encontrado en {inicio:.2f}s. Recorto desde {corte:.2f}s.")
+            print(f"  Corte en {inicio:.2f}s (por {metodo}). Recorto desde {corte:.2f}s.")
 
         guardar_wav(muestras[int(corte * frecuencia):], frecuencia, ruta_limpio)
 
