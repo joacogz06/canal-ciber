@@ -8,12 +8,13 @@ from google.genai import types
 
 MODELO_TTS = "gemini-3.8-flash-tts"
 VOZ = "Achird"
+ETIQUETA = "porteno_ultra_guion5" # cambiala en cada prueba para no pisar las anteriores
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 estilo = Path("estilo_voz.txt").read_text(encoding="utf-8").strip()
-texto_prueba = Path("guiones/02_qué-es-el-phishing-y-cómo-reconocerlo.txt").read_text(encoding="utf-8").strip()
+texto_prueba = Path("guiones/05_por-qué-no-usar-la-misma-contraseña-en-todos-lados.txt").read_text(encoding="utf-8").strip()
 
 respuesta = client.models.generate_content(
     model=MODELO_TTS,
@@ -29,11 +30,12 @@ respuesta = client.models.generate_content(
 )
 
 audio = respuesta.candidates[0].content.parts[0].inline_data.data
+nombre = f"prueba_{VOZ}_{ETIQUETA}.wav"
 
-with wave.open(f"prueba_{VOZ}.wav", "wb") as archivo:
+with wave.open(nombre, "wb") as archivo:
     archivo.setnchannels(1)
     archivo.setsampwidth(2)
     archivo.setframerate(24000)
     archivo.writeframes(audio)
 
-print(f"Listo: prueba_{VOZ}.wav")
+print(f"Listo: {nombre}")
