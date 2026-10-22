@@ -1,13 +1,22 @@
+import hashlib
 import json
 from pathlib import Path
 
 import numpy as np
-from moviepy import AudioFileClip, ColorClip, CompositeVideoClip, ImageClip
+from moviepy import (
+    AudioFileClip,
+    ColorClip,
+    CompositeAudioClip,
+    CompositeVideoClip,
+    ImageClip,
+    afx,
+)
 from PIL import Image, ImageDraw, ImageFont
 
 CARPETA_LIMPIOS = Path("audios_limpios")
 CARPETA_SUBTITULOS = Path("subtitulos")
 CARPETA_VIDEOS = Path("videos")
+CARPETA_MUSICA = Path("musica")
 
 ANCHO, ALTO = 1080, 1920
 COLOR_FONDO = (20, 24, 40)          # azul muy oscuro, provisorio
@@ -19,6 +28,10 @@ ANCHO_MAXIMO_TEXTO = 900            # deja margen a los costados
 GROSOR_BORDE = 8
 ESPACIO_ENTRE_LINEAS = 20
 FPS = 30
+
+VOLUMEN_MUSICA = 0.10               # 10% del volumen original
+FADE_ENTRADA = 1.0                  # segundos
+FADE_SALIDA = 2.0                   # segundos
 
 
 def partir_en_lineas(palabras, fuente):
@@ -40,8 +53,7 @@ def partir_en_lineas(palabras, fuente):
 
 
 def dibujar_subtitulo(palabras, resaltada, fuente):
-    """Dibuja el bloque palabra por palabra, con la palabra 'resaltada' en amarillo.
-    La imagen mide solo lo que ocupa el texto, no toda la pantalla."""
+    """Dibuja el bloque palabra por palabra, con la palabra 'resaltada' en amarillo."""
     palabras = [p.upper() for p in palabras]
     lineas = partir_en_lineas(palabras, fuente)
     espacio = fuente.getlength(" ")
@@ -57,8 +69,8 @@ def dibujar_subtitulo(palabras, resaltada, fuente):
 
     for n, indices in enumerate(lineas):
         ancho_linea = sum(fuente.getlength(palabras[i]) for i in indices) + espacio * (len(indices) - 1)
-        x = (ancho_imagen - ancho_linea) / 2           # centramos cada línea
-        y = margen + n * alto_linea + alto_linea / 2   # centro vertical de la línea
+        x = (ancho_imagen - ancho_linea) / 2
+        y = margen + n * alto_linea + alto_linea / 2
         for i in indices:
             color = COLOR_RESALTADO if i == resaltada else COLOR_TEXTO
             dibujo.text(
@@ -66,7 +78,7 @@ def dibujar_subtitulo(palabras, resaltada, fuente):
                 palabras[i],
                 font=fuente,
                 fill=color,
-                anchor="lm",                    # x = borde izquierdo, y = centro vertical
+                anchor="lm",
                 stroke_width=GROSOR_BORDE,
                 stroke_fill="black",
             )
@@ -75,11 +87,42 @@ def dibujar_subtitulo(palabras, resaltada, fuente):
     return np.array(imagen)
 
 
+def elegir_musica(nombre):
+    """Elige una pista según el nombre del video: siempre la misma para el mismo video."""
+    pistas = sorted(CARPETA_MUSICA.glob("*.mp3"))
+    if not pistas:
+        return None
+    numero = int(hashlib.md5(nombre.encode()).hexdigest(), 16)
+    return pistas[numero % len(pistas)]
+
+
+def armar_audio(voz, nombre):
+    """Mezcla la voz con una pista de música de fondo, si hay."""
+    ruta_musica = elegir_musica(nombre)
+    if ruta_musica is None:
+        print("  No hay música en la carpeta, sigo solo con la voz.")
+        return voz
+
+    print(f"  Música: {ruta_musica.name}")
+    musica = AudioFileClip(str(ruta_musica))
+    if musica.duration < voz.duration:
+        musica = musica.with_effects([afx.AudioLoop(duration=voz.duration)])
+    else:
+        musica = musica.subclipped(0, voz.duration)
+
+    musica = musica.with_effects([
+        afx.MultiplyVolume(VOLUMEN_MUSICA),
+        afx.AudioFadeIn(FADE_ENTRADA),
+        afx.AudioFadeOut(FADE_SALIDA),
+    ])
+    return CompositeAudioClip([musica, voz]).with_duration(voz.duration)
+
+
 def armar_video(nombre, fuente):
-    audio = AudioFileClip(str(CARPETA_LIMPIOS / f"{nombre}.wav"))
+    voz = AudioFileClip(str(CARPETA_LIMPIOS / f"{nombre}.wav"))
     bloques = json.loads((CARPETA_SUBTITULOS / f"{nombre}.json").read_text(encoding="utf-8"))
 
-    fondo = ColorClip(size=(ANCHO, ALTO), color=COLOR_FONDO).with_duration(audio.duration)
+    fondo = ColorClip(size=(ANCHO, ALTO), color=COLOR_FONDO).with_duration(voz.duration)
 
     capas = [fondo]
     for bloque in bloques:
@@ -95,7 +138,7 @@ def armar_video(nombre, fuente):
                 .with_position("center")
             )
 
-    video = CompositeVideoClip(capas, size=(ANCHO, ALTO)).with_audio(audio)
+    video = CompositeVideoClip(capas, size=(ANCHO, ALTO)).with_audio(armar_audio(voz, nombre))
     video.write_videofile(
         str(CARPETA_VIDEOS / f"{nombre}.mp4"),
         fps=FPS,
