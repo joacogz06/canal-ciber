@@ -1,0 +1,68 @@
+[
+  {
+    "numero": 1,
+    "texto": "Te llega un correo urgente del banco pidiendo que cambies tu clave.",
+    "inicio": 0.15,
+    "fin": 3.63
+  },
+  {
+    "numero": 2,
+    "texto": "Eso es phishing, una técnica donde clonan identidades para sacarte datos personales.",
+    "inicio": 3.63,
+    "fin": 8.55
+  },
+  {
+    "numero": 3,
+    "texto": "El texto te avisa sobre un inicio de sesión extraño o una compra que no hiciste.",
+    "inicio": 8.55,
+    "fin": 12.39
+  },
+  {
+    "numero": 4,
+    "texto": "Tocás el enlace y vas directo a una pantalla idéntica a la de tu banco.",
+    "inicio": 12.39,
+    "fin": 16.67
+  },
+  {
+    "numero": 5,
+    "texto": "Tiene los mismos colores, el logo oficial y los campos para iniciar sesión.",
+    "inicio": 16.67,
+    "fin": 20.77
+  },
+  {
+    "numero": 6,
+    "texto": "Si escribís tus credenciales ahí, le estás entregando tu cuenta a los estafadores.",
+    "inicio": 20.77,
+    "fin": 25.09
+  },
+  {
+    "numero": 7,
+    "texto": "Para no caer, la señal más clara está arriba de todo, en el navegador.",
+    "inicio": 25.09,
+    "fin": 29.13
+  },
+  {
+    "numero": 8,
+    "texto": "Revisá siempre el enlace: suelen cambiar una letra por un número o sumar palabras raras.",
+    "inicio": 29.13,
+    "fin": 34.29
+  },
+  {
+    "numero": 9,
+    "texto": "Otra alarma clásica es que te apuren para que resuelvas el tema hoy mismo.",
+    "inicio": 34.29,
+    "fin": 38.01
+  },
+  {
+    "numero": 10,
+    "texto": "Si dudás de una notificación, comunicate por los canales habituales de atención al cliente.",
+    "inicio": 38.01,
+    "fin": 42.81
+  },
+  {
+    "numero": 11,
+    "texto": "Escribí siempre la dirección web vos mismo en lugar de seguir enlaces sospechosos.",
+    "inicio": 42.81,
+    "fin": 47.1
+  }
+]

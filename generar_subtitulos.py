@@ -9,6 +9,7 @@ CARPETA_GUIONES = Path("guiones")
 CARPETA_LIMPIOS = Path("audios_limpios")
 CARPETA_TIEMPOS = Path("tiempos")
 CARPETA_SUBTITULOS = Path("subtitulos")
+CARPETA_FRASES = Path("frases")
 PALABRAS_POR_BLOQUE = 3
 
 
@@ -30,16 +31,12 @@ def alinear(palabras_guion, palabras_whisper, duracion):
                 w = palabras_whisper[j1 + k]
                 tiempos[i1 + k] = (w["inicio"], w["fin"])
         elif tipo == "replace":
-            # Repartimos el tramo de Whisper en partes iguales entre las palabras del guion
             inicio = palabras_whisper[j1]["inicio"]
             fin = palabras_whisper[j2 - 1]["fin"]
             paso = (fin - inicio) / (i2 - i1)
             for k in range(i2 - i1):
                 tiempos[i1 + k] = (inicio + k * paso, inicio + (k + 1) * paso)
-        # "delete" = palabras del guion que Whisper no escuchó: quedan en None
-        # "insert" = palabras que Whisper escuchó de más: las ignoramos
 
-    # Rellenamos los huecos (None) repartiendo el espacio libre entre sus vecinos
     i = 0
     while i < len(tiempos):
         if tiempos[i] is not None:
@@ -59,8 +56,7 @@ def alinear(palabras_guion, palabras_whisper, duracion):
 
 
 def armar_bloques(guion, tiempos, duracion):
-    """Agrupa las palabras en bloques de hasta N, sin cruzar el final de una línea del guion.
-    Cada bloque guarda además sus palabras con su propio tiempo, para el resaltado."""
+    """Bloques de hasta N palabras, sin cruzar el final de una línea, con tiempo por palabra."""
     bloques = []
     indice = 0
     for linea in guion.splitlines():
@@ -77,13 +73,11 @@ def armar_bloques(guion, tiempos, duracion):
             })
             indice += len(grupo)
 
-    # Cada bloque dura hasta que empieza el siguiente; el último, hasta el final del audio
     for actual, siguiente in zip(bloques, bloques[1:]):
         actual["fin"] = siguiente["inicio"]
     if bloques:
         bloques[-1]["fin"] = round(duracion, 2)
 
-    # Lo mismo con las palabras dentro de cada bloque
     for bloque in bloques:
         palabras = bloque["palabras"]
         for actual, siguiente in zip(palabras, palabras[1:]):
@@ -92,8 +86,32 @@ def armar_bloques(guion, tiempos, duracion):
 
     return bloques
 
+
+def armar_frases(guion, tiempos, duracion):
+    """Una entrada por línea del guion, con su número (desde 1), texto, inicio y fin."""
+    frases = []
+    indice = 0
+    for linea in guion.splitlines():
+        palabras = linea.split()
+        if not palabras:
+            continue
+        frases.append({
+            "numero": len(frases) + 1,
+            "texto": linea.strip(),
+            "inicio": round(tiempos[indice][0], 2),
+        })
+        indice += len(palabras)
+
+    for actual, siguiente in zip(frases, frases[1:]):
+        actual["fin"] = siguiente["inicio"]
+    if frases:
+        frases[-1]["fin"] = round(duracion, 2)
+    return frases
+
+
 def main():
     CARPETA_SUBTITULOS.mkdir(exist_ok=True)
+    CARPETA_FRASES.mkdir(exist_ok=True)
     for ruta_tiempos in sorted(CARPETA_TIEMPOS.glob("*.json")):
         nombre = ruta_tiempos.stem
         print(nombre)
@@ -104,10 +122,13 @@ def main():
 
         tiempos = alinear(guion.split(), palabras_whisper, duracion)
         bloques = armar_bloques(guion, tiempos, duracion)
+        frases = armar_frases(guion, tiempos, duracion)
 
-        salida = CARPETA_SUBTITULOS / f"{nombre}.json"
-        salida.write_text(json.dumps(bloques, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"  {len(bloques)} bloques guardados en {salida}")
+        (CARPETA_SUBTITULOS / f"{nombre}.json").write_text(
+            json.dumps(bloques, ensure_ascii=False, indent=2), encoding="utf-8")
+        (CARPETA_FRASES / f"{nombre}.json").write_text(
+            json.dumps(frases, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"  {len(bloques)} bloques y {len(frases)} frases guardados")
 
 
 if __name__ == "__main__":

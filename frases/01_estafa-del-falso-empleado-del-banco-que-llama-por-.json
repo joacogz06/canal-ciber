@@ -1,0 +1,62 @@
+[
+  {
+    "numero": 1,
+    "texto": "Te llama tu banco para avisarte de una compra sospechosa con tu tarjeta.",
+    "inicio": 0.15,
+    "fin": 3.83
+  },
+  {
+    "numero": 2,
+    "texto": "Del otro lado una voz seria te da tu nombre completo y tu DNI.",
+    "inicio": 3.83,
+    "fin": 7.45
+  },
+  {
+    "numero": 3,
+    "texto": "Te dice que alguien está intentando transferir fondos desde tu cuenta bancaria en este momento.",
+    "inicio": 7.45,
+    "fin": 12.19
+  },
+  {
+    "numero": 4,
+    "texto": "Para frenar el supuesto movimiento, te pide que le leas un código numérico que te acaba de llegar por mensaje de texto.",
+    "inicio": 12.19,
+    "fin": 18.41
+  },
+  {
+    "numero": 5,
+    "texto": "Ese mensaje contiene un token de seguridad, una clave temporal para autorizar pagos.",
+    "inicio": 18.41,
+    "fin": 23.33
+  },
+  {
+    "numero": 6,
+    "texto": "La trampa está en que ellos mismos iniciaron la sesión en la web y necesitan ese dato para entrar.",
+    "inicio": 23.33,
+    "fin": 28.85
+  },
+  {
+    "numero": 7,
+    "texto": "Si se lo dictás al operador, confirmás la transferencia fraudulenta que supuestamente estabas cancelando.",
+    "inicio": 28.85,
+    "fin": 34.29
+  },
+  {
+    "numero": 8,
+    "texto": "La señal de alerta es concreta: un empleado bancario real jamás te va a pedir claves por llamada.",
+    "inicio": 34.29,
+    "fin": 39.73
+  },
+  {
+    "numero": 9,
+    "texto": "Ante cualquier sospecha, cortá la comunicación de inmediato y marcá vos el número de atención impreso atrás de tu tarjeta.",
+    "inicio": 39.73,
+    "fin": 45.75
+  },
+  {
+    "numero": 10,
+    "texto": "Las claves de autenticación son de uso personal y no se le dictan a nadie.",
+    "inicio": 45.75,
+    "fin": 49.54
+  }
+]

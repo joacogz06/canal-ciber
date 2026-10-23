@@ -1,0 +1,74 @@
+[
+  {
+    "numero": 1,
+    "texto": "Si hackean una página vieja, pueden entrar a toda tu vida digital.",
+    "inicio": 0.15,
+    "fin": 4.03
+  },
+  {
+    "numero": 2,
+    "texto": "Capaz te registraste hace años en un foro o una tienda de ropa online.",
+    "inicio": 4.03,
+    "fin": 8.37
+  },
+  {
+    "numero": 3,
+    "texto": "Pusiste el correo de siempre y la misma contraseña que usás para todo.",
+    "inicio": 8.37,
+    "fin": 11.87
+  },
+  {
+    "numero": 4,
+    "texto": "Esos sitios chicos muchas veces no cuentan con buena seguridad.",
+    "inicio": 11.87,
+    "fin": 15.55
+  },
+  {
+    "numero": 5,
+    "texto": "Cuando sufren una filtración, tu usuario y tu clave quedan expuestos en internet.",
+    "inicio": 15.55,
+    "fin": 20.13
+  },
+  {
+    "numero": 6,
+    "texto": "Los atacantes agarran esos datos y prueban entrar a bancos, redes y billeteras virtuales.",
+    "inicio": 20.13,
+    "fin": 25.47
+  },
+  {
+    "numero": 7,
+    "texto": "Como la clave es idéntica, acceden a tus cosas sin tener que hackearte directamente.",
+    "inicio": 25.47,
+    "fin": 30.01
+  },
+  {
+    "numero": 8,
+    "texto": "Para cortar ese riesgo sin volverte loco, instalá un gestor de contraseñas.",
+    "inicio": 30.01,
+    "fin": 34.17
+  },
+  {
+    "numero": 9,
+    "texto": "Es una aplicación que genera claves complejas y distintas para cada sitio y las guarda protegidas.",
+    "inicio": 34.17,
+    "fin": 38.73
+  },
+  {
+    "numero": 10,
+    "texto": "Vos solo necesitás acordarte de una clave maestra para abrir esa app.",
+    "inicio": 38.73,
+    "fin": 43.07
+  },
+  {
+    "numero": 11,
+    "texto": "También activá la verificación en dos pasos, para que te pida una confirmación en el celular al iniciar sesión.",
+    "inicio": 43.07,
+    "fin": 48.59
+  },
+  {
+    "numero": 12,
+    "texto": "Empezá hoy cambiando la contraseña de tu correo principal.",
+    "inicio": 48.59,
+    "fin": 51.7
+  }
+]

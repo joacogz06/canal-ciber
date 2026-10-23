@@ -10,33 +10,41 @@ from moviepy import (
     CompositeVideoClip,
     ImageClip,
     afx,
+    vfx,
 )
 from PIL import Image, ImageDraw, ImageFont
 
+import plantillas as p
+
 CARPETA_LIMPIOS = Path("audios_limpios")
 CARPETA_SUBTITULOS = Path("subtitulos")
+CARPETA_FRASES = Path("frases")
+CARPETA_ESCENAS = Path("escenas")
 CARPETA_VIDEOS = Path("videos")
 CARPETA_MUSICA = Path("musica")
 
-ANCHO, ALTO = 1080, 1920
-COLOR_FONDO = (20, 24, 40)          # azul muy oscuro, provisorio
-COLOR_TEXTO = (255, 255, 255)       # blanco
-COLOR_RESALTADO = (255, 214, 0)     # amarillo
-FUENTE = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+ANCHO, ALTO = p.ANCHO, p.ALTO
+COLOR_FONDO = p.AZUL_MARCA
+COLOR_TEXTO = (255, 255, 255)
+COLOR_RESALTADO = p.AMARILLO
+FUENTE = p.FUENTE_BOLD
 TAMANO_FUENTE = 96
-ANCHO_MAXIMO_TEXTO = 900            # deja margen a los costados
+ANCHO_MAXIMO_TEXTO = 900
 GROSOR_BORDE = 8
 ESPACIO_ENTRE_LINEAS = 20
 FPS = 30
 
-VOLUMEN_MUSICA = 0.10               # 10% del volumen original
-FADE_ENTRADA = 1.0                  # segundos
-FADE_SALIDA = 2.0                   # segundos
-UMBRAL_INTRO = 0.5                  # arranca cuando la pista llega al 50% de su volumen fuerte
+VOLUMEN_MUSICA = 0.10
+FADE_ENTRADA = 1.0
+FADE_SALIDA = 2.0
+UMBRAL_INTRO = 0.5
+
+DURACION_ANIMACION = 0.3   # segundos que tarda una escena en entrar
+DESPLAZAMIENTO = 60        # píxeles que sube al entrar
 
 
+# ---------- Subtítulos ----------
 def partir_en_lineas(palabras, fuente):
-    """Reparte las palabras en líneas que entren a lo ancho. Devuelve una lista de listas de índices."""
     lineas, actual, ancho_actual = [], [], 0
     espacio = fuente.getlength(" ")
     for i, palabra in enumerate(palabras):
@@ -54,8 +62,7 @@ def partir_en_lineas(palabras, fuente):
 
 
 def dibujar_subtitulo(palabras, resaltada, fuente):
-    """Dibuja el bloque palabra por palabra, con la palabra 'resaltada' en amarillo."""
-    palabras = [p.upper() for p in palabras]
+    palabras = [x.upper() for x in palabras]
     lineas = partir_en_lineas(palabras, fuente)
     espacio = fuente.getlength(" ")
     ascenso, descenso = fuente.getmetrics()
@@ -74,22 +81,76 @@ def dibujar_subtitulo(palabras, resaltada, fuente):
         y = margen + n * alto_linea + alto_linea / 2
         for i in indices:
             color = COLOR_RESALTADO if i == resaltada else COLOR_TEXTO
-            dibujo.text(
-                (x, y),
-                palabras[i],
-                font=fuente,
-                fill=color,
-                anchor="lm",
-                stroke_width=GROSOR_BORDE,
-                stroke_fill="black",
-            )
+            dibujo.text((x, y), palabras[i], font=fuente, fill=color, anchor="lm",
+                        stroke_width=GROSOR_BORDE, stroke_fill="black")
             x += fuente.getlength(palabras[i]) + espacio
 
     return np.array(imagen)
 
 
+def capas_subtitulos(bloques, fuente, centro_y):
+    capas = []
+    for bloque in bloques:
+        textos = [x["texto"] for x in bloque["palabras"]]
+        for i, palabra in enumerate(bloque["palabras"]):
+            duracion = palabra["fin"] - palabra["inicio"]
+            if duracion <= 0:
+                continue
+            imagen = dibujar_subtitulo(textos, i, fuente)
+            capas.append(
+                ImageClip(imagen)
+                .with_start(palabra["inicio"])
+                .with_duration(duracion)
+                .with_position(("center", centro_y - imagen.shape[0] / 2))
+            )
+    return capas
+
+
+# ---------- Escenas ----------
+def posicion_animada(x, y):
+    """Devuelve una función: la escena arranca DESPLAZAMIENTO px más abajo y sube hasta su lugar."""
+    def posicion(t):
+        progreso = min(1.0, t / DURACION_ANIMACION)
+        return (x, y + DESPLAZAMIENTO * (1 - progreso))
+    return posicion
+
+
+def capas_escenas(nombre, duracion_total):
+    """Lee escenas/<nombre>.json y arma una capa por escena. Si no existe, no hay escenas."""
+    ruta_escenas = CARPETA_ESCENAS / f"{nombre}.json"
+    if not ruta_escenas.exists():
+        return []
+
+    escenas = json.loads(ruta_escenas.read_text(encoding="utf-8"))
+    frases = json.loads((CARPETA_FRASES / f"{nombre}.json").read_text(encoding="utf-8"))
+    inicio_de = {f["numero"]: f["inicio"] for f in frases}
+
+    capas = []
+    for k, escena in enumerate(escenas):
+        inicio = inicio_de[escena["frase"]]
+        if k + 1 < len(escenas):
+            fin = inicio_de[escenas[k + 1]["frase"]]
+        else:
+            fin = duracion_total
+        if fin <= inicio:
+            continue
+
+        imagen = p.PLANTILLAS[escena["escena"]](escena)
+        alto, ancho = imagen.shape[:2]
+        x = (ANCHO - ancho) / 2
+        y = p.CENTRO_ESCENA_Y - alto / 2
+        capas.append(
+            ImageClip(imagen)
+            .with_start(inicio)
+            .with_duration(fin - inicio)
+            .with_position(posicion_animada(x, y))
+            .with_effects([vfx.CrossFadeIn(DURACION_ANIMACION)])
+        )
+    return capas
+
+
+# ---------- Música ----------
 def elegir_musica(nombre):
-    """Elige una pista según el nombre del video: siempre la misma para el mismo video."""
     pistas = sorted(CARPETA_MUSICA.glob("*.mp3"))
     if not pistas:
         return None
@@ -98,12 +159,10 @@ def elegir_musica(nombre):
 
 
 def fin_de_intro(musica):
-    """Devuelve el segundo donde la pista ya suena fuerte, saltando una intro silenciosa."""
-    frecuencia = 4000  # alcanza para medir volumen, y es mucho más rápido que leer en calidad completa
+    frecuencia = 4000
     muestras = musica.to_soundarray(fps=frecuencia)
     if muestras.ndim > 1:
-        muestras = muestras.mean(axis=1)  # estéreo a mono
-
+        muestras = muestras.mean(axis=1)
     segundos = len(muestras) // frecuencia
     if segundos < 2:
         return 0.0
@@ -111,13 +170,12 @@ def fin_de_intro(musica):
         np.sqrt(np.mean(muestras[s * frecuencia:(s + 1) * frecuencia] ** 2))
         for s in range(segundos)
     ])
-    referencia = np.percentile(volumen, 90)  # lo fuerte que suena en sus partes altas
+    referencia = np.percentile(volumen, 90)
     fuertes = np.where(volumen >= referencia * UMBRAL_INTRO)[0]
     return float(fuertes[0]) if len(fuertes) else 0.0
 
 
 def armar_audio(voz, nombre):
-    """Mezcla la voz con una pista de música de fondo, si hay."""
     ruta_musica = elegir_musica(nombre)
     if ruta_musica is None:
         print("  No hay música en la carpeta, sigo solo con la voz.")
@@ -141,25 +199,17 @@ def armar_audio(voz, nombre):
     return CompositeAudioClip([musica, voz]).with_duration(voz.duration)
 
 
+# ---------- Video ----------
 def armar_video(nombre, fuente):
     voz = AudioFileClip(str(CARPETA_LIMPIOS / f"{nombre}.wav"))
     bloques = json.loads((CARPETA_SUBTITULOS / f"{nombre}.json").read_text(encoding="utf-8"))
 
-    fondo = ColorClip(size=(ANCHO, ALTO), color=COLOR_FONDO).with_duration(voz.duration)
+    escenas = capas_escenas(nombre, voz.duration)
+    print(f"  Escenas: {len(escenas)}")
+    centro_subs = p.CENTRO_SUBTITULOS_Y if escenas else ALTO / 2
 
-    capas = [fondo]
-    for bloque in bloques:
-        textos = [p["texto"] for p in bloque["palabras"]]
-        for i, palabra in enumerate(bloque["palabras"]):
-            duracion = palabra["fin"] - palabra["inicio"]
-            if duracion <= 0:
-                continue
-            capas.append(
-                ImageClip(dibujar_subtitulo(textos, i, fuente))
-                .with_start(palabra["inicio"])
-                .with_duration(duracion)
-                .with_position("center")
-            )
+    fondo = ColorClip(size=(ANCHO, ALTO), color=COLOR_FONDO).with_duration(voz.duration)
+    capas = [fondo, *escenas, *capas_subtitulos(bloques, fuente, centro_subs)]
 
     video = CompositeVideoClip(capas, size=(ANCHO, ALTO)).with_audio(armar_audio(voz, nombre))
     video.write_videofile(

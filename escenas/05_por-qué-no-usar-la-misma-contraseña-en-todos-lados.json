@@ -1,0 +1,42 @@
+[
+    {
+        "frase": 1,
+        "escena": "texto",
+        "texto": "Una página *vieja* puede abrir toda tu vida"
+    },
+    {
+        "frase": 3,
+        "escena": "texto",
+        "texto": "La *misma* contraseña para todo"
+    },
+    {
+        "frase": 5,
+        "escena": "texto",
+        "texto": "Filtración = tu clave *expuesta*"
+    },
+    {
+        "frase": 6,
+        "escena": "texto",
+        "texto": "Prueban en bancos, redes y *billeteras*"
+    },
+    {
+        "frase": 8,
+        "escena": "texto",
+        "texto": "Usá un *gestor de contraseñas*"
+    },
+    {
+        "frase": 10,
+        "escena": "texto",
+        "texto": "Una sola clave *maestra*"
+    },
+    {
+        "frase": 11,
+        "escena": "texto",
+        "texto": "Activá la *verificación en dos pasos*"
+    },
+    {
+        "frase": 12,
+        "escena": "texto",
+        "texto": "Hoy: cambiá la clave de tu *mail*"
+    }
+]

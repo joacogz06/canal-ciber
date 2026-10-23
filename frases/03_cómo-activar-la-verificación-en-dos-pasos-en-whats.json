@@ -1,0 +1,80 @@
+[
+  {
+    "numero": 1,
+    "texto": "Te llega un mensaje pidiendo un código y perdés tu WhatsApp.",
+    "inicio": 0.15,
+    "fin": 4.35
+  },
+  {
+    "numero": 2,
+    "texto": "Un conocido te escribe diciendo que te mandó un número por error y te pide que se lo pases.",
+    "inicio": 4.35,
+    "fin": 8.85
+  },
+  {
+    "numero": 3,
+    "texto": "En realidad, alguien está intentando registrar tu cuenta en otro teléfono usando tu línea.",
+    "inicio": 8.85,
+    "fin": 13.43
+  },
+  {
+    "numero": 4,
+    "texto": "Ese mensaje que te llegó contiene la clave de registro que la app pide para iniciar sesión.",
+    "inicio": 13.43,
+    "fin": 18.69
+  },
+  {
+    "numero": 5,
+    "texto": "Si compartís esos números, esa persona toma el control de tus chats.",
+    "inicio": 18.69,
+    "fin": 22.67
+  },
+  {
+    "numero": 6,
+    "texto": "Para protegerte, tenés que ponerle una barrera propia que solo vos conozcas.",
+    "inicio": 22.67,
+    "fin": 27.37
+  },
+  {
+    "numero": 7,
+    "texto": "Abrí WhatsApp y andá a los tres puntos arriba a la derecha, o a Ajustes si usás iPhone.",
+    "inicio": 27.37,
+    "fin": 33.25
+  },
+  {
+    "numero": 8,
+    "texto": "Entrá en Cuenta y después tocá donde dice Verificación en dos pasos.",
+    "inicio": 33.25,
+    "fin": 37.23
+  },
+  {
+    "numero": 9,
+    "texto": "Apretá el botón para activarla.",
+    "inicio": 37.23,
+    "fin": 39.53
+  },
+  {
+    "numero": 10,
+    "texto": "Elegí un PIN, que es una clave numérica de seis dígitos creada por vos.",
+    "inicio": 39.53,
+    "fin": 43.79
+  },
+  {
+    "numero": 11,
+    "texto": "Agregá un correo electrónico para poder recuperarla si te la olvidás.",
+    "inicio": 43.79,
+    "fin": 47.69
+  },
+  {
+    "numero": 12,
+    "texto": "Con esto configurado, aunque alguien consiga tu mensaje de texto, no va a poder entrar.",
+    "inicio": 47.69,
+    "fin": 52.05
+  },
+  {
+    "numero": 13,
+    "texto": "Acordate siempre: los códigos que te llegan por mensaje son solamente para vos.",
+    "inicio": 52.05,
+    "fin": 56.68
+  }
+]

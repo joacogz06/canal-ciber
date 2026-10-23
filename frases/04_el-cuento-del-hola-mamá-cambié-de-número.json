@@ -1,0 +1,68 @@
+[
+  {
+    "numero": 1,
+    "texto": "Te llega un mensaje diciendo: \"Hola má, agendá mi nuevo número\".",
+    "inicio": 0.15,
+    "fin": 4.17
+  },
+  {
+    "numero": 2,
+    "texto": "La foto de perfil suele ser de tu hijo, sacada de alguna red social pública.",
+    "inicio": 4.17,
+    "fin": 8.37
+  },
+  {
+    "numero": 3,
+    "texto": "Te cuenta que tuvo un problema con el teléfono y que va a usar esa línea temporalmente.",
+    "inicio": 8.37,
+    "fin": 12.85
+  },
+  {
+    "numero": 4,
+    "texto": "Al poco tiempo, aparece el verdadero objetivo de la maniobra.",
+    "inicio": 12.85,
+    "fin": 16.27
+  },
+  {
+    "numero": 5,
+    "texto": "Te pide que hagas una transferencia urgente porque su aplicación del banco está bloqueada.",
+    "inicio": 16.27,
+    "fin": 20.59
+  },
+  {
+    "numero": 6,
+    "texto": "La trampa se apoya en tu confianza y en las ganas lógicas de ayudar a tu familia.",
+    "inicio": 20.59,
+    "fin": 24.77
+  },
+  {
+    "numero": 7,
+    "texto": "Si intentás llamar a ese contacto, no atiende y te escribe que no le anda el micrófono.",
+    "inicio": 24.77,
+    "fin": 29.53
+  },
+  {
+    "numero": 8,
+    "texto": "La señal de alerta definitiva es esa: la excusa constante para no hablar.",
+    "inicio": 29.53,
+    "fin": 33.97
+  },
+  {
+    "numero": 9,
+    "texto": "Ante la duda, llamá de inmediato a la línea vieja que ya tenías agendada.",
+    "inicio": 33.97,
+    "fin": 37.87
+  },
+  {
+    "numero": 10,
+    "texto": "Otra opción es hacerle una pregunta personal sobre algún recuerdo familiar que nadie más conozca.",
+    "inicio": 37.87,
+    "fin": 43.27
+  },
+  {
+    "numero": 11,
+    "texto": "Antes de transferir un solo peso, confirmá siempre la identidad con una llamada tradicional.",
+    "inicio": 43.27,
+    "fin": 48.64
+  }
+]
